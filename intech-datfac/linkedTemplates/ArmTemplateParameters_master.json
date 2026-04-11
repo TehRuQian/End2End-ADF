@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "intech-datfac"
+		},
+		"AzureDataLakeStorageLinkedService_accountKey": {
+			"value": ""
+		},
+		"AzureDataLakeStorageLinkedService_properties_typeProperties_url": {
+			"value": "https://intechsacc.dfs.core.windows.net/"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"value": "https://intech-kvault.vault.azure.net/"
+		},
+		"SqlServerOnPremLinkedService_properties_typeProperties_server": {
+			"value": "LAPTOP-86A7BPHC\\SQLEXPRESS"
+		},
+		"SqlServerOnPremLinkedService_properties_typeProperties_database": {
+			"value": "AdventureWorksLT2025"
+		},
+		"SqlServerOnPremLinkedService_properties_typeProperties_userName": {
+			"value": "teh"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
