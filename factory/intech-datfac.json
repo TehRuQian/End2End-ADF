@@ -1,0 +1,9 @@
+{
+	"name": "intech-datfac",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "9c2822c1-2282-4d00-aa74-9dac5f3b972e",
+		"tenantId": "6b50ecb4-fb40-4fce-82fe-542c6a666e3b"
+	}
+}
