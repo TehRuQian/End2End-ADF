@@ -82,17 +82,13 @@
 							],
 							"storeSettings": {
 								"type": "AzureBlobFSReadSettings",
-								"recursive": true,
-								"enablePartitionDiscovery": false
-							},
-							"formatSettings": {
-								"type": "BinaryReadSettings"
+								"recursive": false
 							}
 						}
 					},
 					{
-						"name": "ForEach1",
-						"type": "ForEach",
+						"name": "FilterValidFolders",
+						"type": "Filter",
 						"dependsOn": [
 							{
 								"activity": "Get Table Names",
@@ -107,13 +103,35 @@
 								"value": "@activity('Get Table Names').output.childItems",
 								"type": "Expression"
 							},
+							"condition": {
+								"value": "@and(equals(item().type,'Folder'), and(not(startsWith(item().name,'__')), not(contains(item().name,' '))))",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "FilterValidFolders",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('FilterValidFolders').output.value",
+								"type": "Expression"
+							},
 							"activities": [
 								{
 									"name": "Stored procedure1",
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [],
 									"policy": {
-										"timeout": "0.12:00:00",
 										"retry": 0,
 										"retryIntervalInSeconds": 30,
 										"secureOutput": false,
@@ -539,7 +557,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "USE gold_db\nGO\n\nCREATE OR ALTER PROC CreateSQLServerlessView_gold @ViewName NVARCHAR(100)\nAS\nBEGIN\n    DECLARE @statement NVARCHAR(MAX) -- Changed to NVARCHAR for better compatibility\n    \n    -- Clean the variable to prevent path errors\n    DECLARE @CleanPath NVARCHAR(200) = LTRIM(RTRIM(@ViewName))\n\n    SET @statement = N'CREATE OR ALTER VIEW [' + @CleanPath + '] AS\n        SELECT\n            *\n        FROM\n            OPENROWSET(\n                BULK ''https://intechsacc.dfs.core.windows.net/gold/SaleLT/' + @CleanPath + ''',\n                FORMAT = ''DELTA''\n            ) AS [result]'\n    \n    -- This executes the string we just built\n    EXEC sp_executesql @statement\nEND\nGO",
+					"query": "USE gold_db\nGO\n\nCREATE OR ALTER PROC CreateSQLServerlessView_gold \n    @ViewName NVARCHAR(100)\nAS\nBEGIN\n    DECLARE @sql NVARCHAR(MAX)\n\n    SET @ViewName = LTRIM(RTRIM(@ViewName))\n\n    SET @sql = N'\n    CREATE OR ALTER VIEW [' + @ViewName + '] AS\n    SELECT *\n    FROM OPENROWSET(\n        BULK ''https://intechsacc.dfs.core.windows.net/gold/SalesLT/' + @ViewName + '/'',\n        FORMAT = ''DELTA''\n    ) AS result'\n\n    EXEC (@sql)\nEND\nGO",
 					"metadata": {
 						"language": "sql"
 					},
