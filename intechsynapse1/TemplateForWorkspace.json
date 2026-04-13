@@ -24,6 +24,14 @@
 			"type": "string",
 			"defaultValue": "https://intech-kvault.vault.azure.net/"
 		},
+		"AzureSqlDatabase_Gold_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "intechsynapse1-ondemand.sql.azuresynapse.net"
+		},
+		"AzureSqlDatabase_Gold_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "gold_db"
+		},
 		"SqlServerOnPremLinkedService_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "LAPTOP-86A7BPHC\\SQLEXPRESS"
@@ -39,20 +47,110 @@
 		"intechsynapse1-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://intechsacc.dfs.core.windows.net"
-		},
-		"AzureSqlDatabase_Gold_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "intechsynapse1-ondemand.sql.azuresynapse.net"
-		},
-		"AzureSqlDatabase_Gold_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "gold_db"
 		}
 	},
 	"variables": {
 		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/Pipeline 1')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Table Names",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "Binary1",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "BinaryReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Table Names",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Table Names').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Stored procedure1",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[dbo].[CreateSQLServerlessView_gold]",
+										"storedProcedureParameters": {
+											"ViewName": {
+												"value": {
+													"value": "@item().name",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "AzureSqlDatabase_Gold",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/Binary1')]",
+				"[concat(variables('workspaceId'), '/linkedServices/AzureSqlDatabase_Gold')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/copy_all_tables')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
@@ -185,6 +283,29 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Binary1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "intechsynapse1-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "SalesLT ",
+						"fileSystem": "gold"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/intechsynapse1-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Parquet1Sink')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -271,6 +392,29 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureSqlDatabase_Gold')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('AzureSqlDatabase_Gold_properties_typeProperties_server')]",
+					"database": "[parameters('AzureSqlDatabase_Gold_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SystemAssignedManagedIdentity"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/SqlServerOnPremLinkedService')]",
@@ -408,29 +552,6 @@
 				"type": "SqlQuery"
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/AzureSqlDatabase_Gold')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('AzureSqlDatabase_Gold_properties_typeProperties_server')]",
-					"database": "[parameters('AzureSqlDatabase_Gold_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SystemAssignedManagedIdentity"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
 		}
 	]
 }
