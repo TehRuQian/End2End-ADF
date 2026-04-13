@@ -125,7 +125,7 @@
 										"storedProcedureParameters": {
 											"ViewName": {
 												"value": {
-													"value": "@item().name",
+													"value": "@trim(item().name)",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -539,7 +539,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "USE gold_db\nGO\n\nCREATE OR ALTER PROC CreateSQLServerlessView_gold @ViewName NVARCHAR(100)\nAS\nBEGIN\n    DECLARE @statement VARCHAR(MAX)\n    SET @statement = N'CREATE OR ALTER VIEW ' + @ViewName + ' AS\n        SELECT\n            *\n        FROM\n            OPENROWSET(\n                BULK ''https://intechsacc.dfs.core.windows.net/gold/SaleLT/' + @ViewName + '/'',\n                FORMAT = ''DELTA''\n            ) AS [result]'\n    \n    EXEC (@statement)\nEND\nGO",
+					"query": "USE gold_db\nGO\n\nCREATE OR ALTER PROC CreateSQLServerlessView_gold @ViewName NVARCHAR(100)\nAS\nBEGIN\n    DECLARE @statement NVARCHAR(MAX) -- Changed to NVARCHAR for better compatibility\n    \n    -- Clean the variable to prevent path errors\n    DECLARE @CleanPath NVARCHAR(200) = LTRIM(RTRIM(@ViewName))\n\n    SET @statement = N'CREATE OR ALTER VIEW [' + @CleanPath + '] AS\n        SELECT\n            *\n        FROM\n            OPENROWSET(\n                BULK ''https://intechsacc.dfs.core.windows.net/gold/SaleLT/' + @CleanPath + ''',\n                FORMAT = ''DELTA''\n            ) AS [result]'\n    \n    -- This executes the string we just built\n    EXEC sp_executesql @statement\nEND\nGO",
 					"metadata": {
 						"language": "sql"
 					},
