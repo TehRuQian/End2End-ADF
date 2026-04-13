@@ -24,6 +24,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
@@ -62,6 +63,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
+								"storedProcedureName": "[dbo].[CreateSQLServerlessView_gold]",
 								"storedProcedureParameters": {
 									"ViewName": {
 										"value": {
