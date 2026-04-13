@@ -28,6 +28,12 @@
 		},
 		"intechsynapse1-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://intechsacc.dfs.core.windows.net"
+		},
+		"AzureSqlDatabase_Gold_properties_typeProperties_server": {
+			"value": "intechsynapse1-ondemand.sql.azuresynapse.net"
+		},
+		"AzureSqlDatabase_Gold_properties_typeProperties_database": {
+			"value": "gold_db"
 		}
 	}
 }
