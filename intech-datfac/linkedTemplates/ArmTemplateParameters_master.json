@@ -11,6 +11,9 @@
 		"AzureDataLakeStorageLinkedService_properties_typeProperties_url": {
 			"value": "https://intechsacc.dfs.core.windows.net/"
 		},
+		"AzureDatabricksLinkedService_properties_typeProperties_existingClusterId": {
+			"value": "0413-065325-f5dp4jhq"
+		},
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://intech-kvault.vault.azure.net/"
 		},

@@ -15,6 +15,10 @@
 			"type": "string",
 			"defaultValue": "https://intechsacc.dfs.core.windows.net/"
 		},
+		"AzureDatabricksLinkedService_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0413-065325-f5dp4jhq"
+		},
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://intech-kvault.vault.azure.net/"
@@ -66,6 +70,9 @@
 					},
 					"AzureKeyVault1_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+					},
+					"AzureDatabricksLinkedService_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('AzureDatabricksLinkedService_properties_typeProperties_existingClusterId')]"
 					},
 					"SqlServerOnPremLinkedService_properties_typeProperties_server": {
 						"value": "[parameters('SqlServerOnPremLinkedService_properties_typeProperties_server')]"
