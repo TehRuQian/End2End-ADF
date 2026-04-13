@@ -67,7 +67,7 @@
 								"storedProcedureParameters": {
 									"ViewName": {
 										"value": {
-											"value": "@item().name",
+											"value": "@trim(item().name)",
 											"type": "Expression"
 										},
 										"type": "String"
