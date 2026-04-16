@@ -28,7 +28,9 @@ The project uses a full Azure-based technology stack:
 These tools work together to create a scalable and secure data engineeering pipeline. 
 ## Data Pipeline Architecture
 The data pipeline follows a layered medallion architecture, where data is refined from raw input into business-ready outputs. The diagram below shows the full end-to-end flow across all components.
-[image]
+<p align="center">
+  <img src="image/Overview Data Pipeline.png" width="500">
+</p>
 
 **Stage 1: Data Source(On-Premises SQL Database)**
 
@@ -37,7 +39,9 @@ The pipeline starts with an on-premises SQL Server database that stores customer
 **Stage 2: Ingestion(Azure Data Factory)**
 
 Azure Data Factory handles data ingestion and overall pipeline orchestration. It connects to the on-premises database and extracts tables dynamically using a ForEach activity, allowing new tables to be included without modifying the pipeline. It also coordinates downstream processes, such as triggering Databricks notebooks, updating Synapse views, and scheduling pipeline runs. The diagram belows shows the data pipeline is created in Azure Data Factory.
-[image]
+<p align="center">
+  <img src="image/Azure Data Pipeline.png" width="800">
+</p>
 
 **Stage 3: Storage & Transformation**
 
@@ -67,3 +71,6 @@ Even though the video was only about 2.5 hours, it took me almost 3 days to comp
 By completing this project, I gained a better understanding of how an end-to-end data pipeline works. I was able to see how different Azure services are connected and how data moves from one stage to another, starting from data ingestion, followed by transformation, and finally visualization. I also learned how important it is to properly structure and clean data before using it for analysis.
 
 Overall, this project provided me with hands-on experience in data engineering and showed how powerful cloud-based solutions can be in handling and processing large amounts of data efficiently.
+<p align="center">
+  <img src="image/Reflection.png" width="800">
+</p>
