@@ -63,7 +63,7 @@ Power BI connects to the Synapse views to create an interactive dashboard, allow
 Security and access control are handled across the entire system using Azure Active Directory (Entra ID), which manages authentication between services. Azure Key Vault is used to securely store sensitive information such as connection strings and access keys, ensuring credentials are never hardcoded and are safely retrieved when needed.
 
 ## MS Power BI Dashboard
-The Power BI dashboard is designed to provide clear and interactive insights into the business data. _Click here to view the dashboard is created for this project._
+The Power BI dashboard is designed to provide clear and interactive insights into the business data. Click [here](https://github.com/TehRuQian/End2End-ADF/blob/b3e84dd5ab056b967555a7ecaf2319a46ef21f91/ADF%20Project-Dashboard.pbix) to view the dashboard is created for this project.
 
 ## Reflection
 Even though the video was only about 2.5 hours, it took me almost 3 days to complete it. Along the way, I faced many issues such as account limitations during system setup, missing source files and errors when running and debugging the pipeline. However, these difficulties became the most valuble part of the learning process, as they helped me better understand how to troubleshoot and solve real-world problems. 
